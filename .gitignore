@@ -1,0 +1,21 @@
+# Entornos y dependencias
+backend/venv/
+frontend/node_modules/
+
+# Variables de entorno reales
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Django
+backend/db.sqlite3
+backend/staticfiles/
+
+# Vite/React build
+frontend/dist/
+
+# Editor
+.vscode/
+.idea/
