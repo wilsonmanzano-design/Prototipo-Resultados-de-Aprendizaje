@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from core.models import Corte
 from evaluaciones.models import RubricaCriterio, RubricaNivel
-
+from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
     help = (
@@ -10,6 +10,10 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        grupos = ['Administrador', 'Docente']
+        for nombre_grupo in grupos:
+                grupo, created = Group.objects.get_or_create(name=nombre_grupo)
+                self.stdout.write(self._msg(grupo, created, 'Grupo'))
         cortes = [
             ('Primer Corte', 1),
             ('Segundo Corte', 2),

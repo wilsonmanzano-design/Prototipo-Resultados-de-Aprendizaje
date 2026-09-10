@@ -108,11 +108,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Peticiones de react a django 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+CORS_ALLOWED_CREDENTIALS = True
+
+# CSRF: Django 4+ valida el header Origin en peticiones cross-port
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:8000',
+]
+
+# Django REST Framework: autenticación por sesión (no JWT, como acordamos)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
 TIME_ZONE = 'UTC'
 
