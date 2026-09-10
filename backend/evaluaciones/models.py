@@ -122,3 +122,26 @@ class RubricaRespuesta(models.Model):
     class Meta:
         db_table = 'rubrica_respuesta'
         unique_together = ('rubrica_estudiante', 'criterio')
+
+class VwEvaluacionEstadistica(models.Model):
+    evaluacion_rac = models.OneToOneField(
+        EvaluacionRac, primary_key=True, db_column='evaluacion_rac_id',
+        on_delete=models.DO_NOTHING, related_name='estadistica'
+    )
+    oferta_id = models.IntegerField()
+    rac_id = models.IntegerField()
+    corte_id = models.IntegerField()
+    matriculados = models.IntegerField()
+    participantes = models.IntegerField()
+    porcentaje_participacion = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    competentes = models.IntegerField()
+    no_competentes = models.IntegerField()
+    media = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    mediana = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    desviacion_estandar = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    valor_mayor = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    valor_menor = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+
+    class Meta:
+        managed = False  # Django NO debe crear/alterar/borrar esta tabla: ya existe como vista SQL
+        db_table = 'vw_evaluacion_estadistica'
