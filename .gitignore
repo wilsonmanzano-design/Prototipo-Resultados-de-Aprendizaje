@@ -19,3 +19,4 @@ frontend/dist/
 # Editor
 .vscode/
 .idea/
+frontend/.env
