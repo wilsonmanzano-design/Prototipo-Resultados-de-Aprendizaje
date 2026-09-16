@@ -10,6 +10,8 @@ from .serializers import (
     RubricaCriterioSerializer, EstadisticaEvaluacionSerializer,
     DiligenciarEvaluacionRacSerializer
 )
+from rest_framework.parsers import MultiPartParser
+from .services.importador_estudiantes import importar_estudiantes_desde_excel
 
 
 class OfertaAcademicaViewSet(viewsets.ReadOnlyModelViewSet):
@@ -98,3 +100,36 @@ class DiligenciarEvaluacionRacView(APIView):
 
         evaluacion = serializer.save()
         return Response(EvaluacionRacSerializer(evaluacion).data, status=status.HTTP_201_CREATED)
+
+TAMANO_MAXIMO_MB = 5
+
+
+class ImportarEstudiantesExcelView(APIView):
+    """POST /api/matricula/importar-excel/
+    Recibe multipart/form-data: archivo (.xlsx), oferta_id, corte_id."""
+
+    parser_classes = [MultiPartParser]
+
+    def post(self, request):
+        archivo = request.FILES.get('archivo')
+        oferta_id = request.data.get('oferta_id')
+        corte_id = request.data.get('corte_id')
+
+        if archivo is None:
+            return Response({'detail': 'Debe adjuntar un archivo en el campo "archivo".'}, status=status.HTTP_400_BAD_REQUEST)
+        if not archivo.name.lower().endswith('.xlsx'):
+            return Response({'detail': 'El archivo debe tener extension .xlsx'}, status=status.HTTP_400_BAD_REQUEST)
+        if archivo.size > TAMANO_MAXIMO_MB * 1024 * 1024:
+            return Response({'detail': f'El archivo supera el limite de {TAMANO_MAXIMO_MB} MB.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not oferta_id or not corte_id:
+            return Response({'detail': 'Los campos "oferta_id" y "corte_id" son obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        oferta = get_object_or_404(OfertaAcademica, pk=oferta_id)
+        permiso = EsDocenteDeLaOferta()
+        if not permiso.has_object_permission(request, self, oferta):
+            return Response({'detail': permiso.message}, status=status.HTTP_403_FORBIDDEN)
+
+        resumen = importar_estudiantes_desde_excel(archivo, oferta_id=oferta.id, corte_id=corte_id)
+
+        codigo_http = status.HTTP_200_OK if not resumen['errores'] else status.HTTP_207_MULTI_STATUS
+        return Response(resumen, status=codigo_http)

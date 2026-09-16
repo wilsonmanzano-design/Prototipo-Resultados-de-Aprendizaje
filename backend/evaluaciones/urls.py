@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     OfertaAcademicaViewSet, MatriculadosPorOfertaView, RubricaCriterioViewSet,
-    EvaluacionRacViewSet, EstadisticaEvaluacionView, DiligenciarEvaluacionRacView
+    EvaluacionRacViewSet, EstadisticaEvaluacionView, DiligenciarEvaluacionRacView,
+    ImportarEstudiantesExcelView
 )
 
 router = DefaultRouter()
@@ -15,4 +16,5 @@ urlpatterns = [
     path('evaluaciones-rac/diligenciar/', DiligenciarEvaluacionRacView.as_view(), name='evaluacion-rac-diligenciar'),
     path('evaluaciones-rac/<int:evaluacion_id>/estadisticas/', EstadisticaEvaluacionView.as_view(), name='evaluacion-rac-estadisticas'),
     path('', include(router.urls)),
+        path('matricula/importar-excel/', ImportarEstudiantesExcelView.as_view(), name='matricula-importar-excel'),
 ]
