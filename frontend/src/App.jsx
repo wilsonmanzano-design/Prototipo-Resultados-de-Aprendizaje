@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import MisEvaluaciones from './pages/MisEvaluaciones';
 import Dashboard from './pages/Dashboard';
 import NoAutorizado from './pages/NoAutorizado';
+import DiligenciarEvaluacion from './pages/DiligenciarEvaluacion';
 
 function RedireccionInicial() {
   const { usuario, cargando } = useAuth();
@@ -28,6 +29,14 @@ export default function App() {
               element={
                 <RutaPrivada rolRequerido="Docente">
                   <MisEvaluaciones />
+                </RutaPrivada>
+              }
+            />
+            <Route
+              path="/diligenciar/:ofertaId"
+              element={
+                <RutaPrivada rolRequerido="Docente">
+                  <DiligenciarEvaluacion />
                 </RutaPrivada>
               }
             />
