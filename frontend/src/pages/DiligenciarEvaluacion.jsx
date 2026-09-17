@@ -263,7 +263,118 @@ export default function DiligenciarEvaluacion() {
         </div>
       </fieldset>
 
-      {/* Aquí sigue la tabla de rúbrica y el resto del formulario (Paso 8.4) */}
+      {/* --- Tabla de rúbrica por estudiante --- */}
+      {estudiantes.length > 0 && (
+        <fieldset style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+          <legend>3. Calificación por criterio</legend>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
+              <thead>
+                <tr>
+                  <th style={estiloCelda}>Estudiante</th>
+                  {criterios.map((c) => (
+                    <th key={c.id} style={estiloCelda}>{c.nombre}</th>
+                  ))}
+                  <th style={estiloCelda}>Valoración</th>
+                </tr>
+              </thead>
+              <tbody>
+                {estudiantes.map((m) => {
+                  const todasRespondidas = criterios.every((c) => respuestas[m.estudiante]?.[c.id]);
+                  return (
+                    <tr key={m.estudiante}>
+                      <td style={estiloCelda}>{m.estudiante_nombre}</td>
+                      {criterios.map((c) => (
+                        <td key={c.id} style={estiloCelda}>
+                          <select
+                            value={respuestas[m.estudiante]?.[c.id] || ''}
+                            onChange={(e) => seleccionarNivel(m.estudiante, c.id, e.target.value)}
+                          >
+                            <option value="">-- Sin calificar --</option>
+                            {c.niveles.map((n) => (
+                              <option key={n.id} value={n.id}>{n.nombre}</option>
+                            ))}
+                          </select>
+                        </td>
+                      ))}
+                      <td style={{ ...estiloCelda, textAlign: 'center' }}>
+                        {todasRespondidas ? '✓' : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+      )}
+
+      {/* --- Análisis y propuesta --- */}
+      {estudiantes.length > 0 && (
+        <fieldset style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+          <legend>4. Análisis y propuesta</legend>
+          <CampoTexto etiqueta="Elementos que permitieron alcanzar el RAP" valor={analisis.elementos_permitieron}
+            onChange={(v) => manejarCambioAnalisis('elementos_permitieron', v)} />
+          <CampoTexto etiqueta="Elementos que impidieron alcanzar el RAP" valor={analisis.elementos_impidieron}
+            onChange={(v) => manejarCambioAnalisis('elementos_impidieron', v)} />
+          <CampoTexto etiqueta="Medios educativos / infraestructura" valor={analisis.elementos_medios_infra}
+            onChange={(v) => manejarCambioAnalisis('elementos_medios_infra', v)} />
+          <CampoTexto etiqueta="Propuesta de metodología" valor={analisis.propuesta_metodologia}
+            onChange={(v) => manejarCambioAnalisis('propuesta_metodologia', v)} />
+          <CampoTexto etiqueta="Propuesta de contenido" valor={analisis.propuesta_contenido}
+            onChange={(v) => manejarCambioAnalisis('propuesta_contenido', v)} />
+          <CampoTexto etiqueta="Situación del curso" valor={analisis.propuesta_situacion_curso}
+            onChange={(v) => manejarCambioAnalisis('propuesta_situacion_curso', v)} />
+        </fieldset>
+      )}
+
+      {/* --- Guardar --- */}
+      {estudiantes.length > 0 && (
+        <div style={{ marginBottom: '2rem' }}>
+          {erroresValidacion.length > 0 && (
+            <ul style={{ color: '#a00' }}>
+              {erroresValidacion.map((e, i) => <li key={i}>{e}</li>)}
+            </ul>
+          )}
+
+          <button onClick={manejarGuardar} disabled={guardando} style={{ padding: '0.6rem 1.2rem' }}>
+            {guardando ? 'Guardando...' : 'Guardar evaluación'}
+          </button>
+
+          {resultadoGuardado && (
+            resultadoGuardado.exito ? (
+              <div style={{ background: '#eef9ee', padding: '0.75rem', marginTop: '1rem', borderRadius: 4 }}>
+                <strong>Evaluación guardada correctamente.</strong>
+                {estadisticas && (
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                    Media: {estadisticas.media} · Competentes: {estadisticas.competentes} ·
+                    No competentes: {estadisticas.no_competentes} ·
+                    Participación: {estadisticas.porcentaje_participacion}%
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ color: '#a00', marginTop: '1rem' }}>{resultadoGuardado.mensaje}</div>
+            )
+          )}
+        </div>
+      )}
     </div>
+  );
+}
+
+const estiloCelda = { border: '1px solid #ddd', padding: '0.5rem', textAlign: 'left' };
+
+function CampoTexto({ etiqueta, valor, onChange }) {
+  return (
+    <label style={{ display: 'block', marginBottom: '0.75rem' }}>
+      {etiqueta}
+      <textarea
+        value={valor}
+        onChange={(e) => onChange(e.target.value)}
+        rows={2}
+        style={{ width: '100%', padding: '0.4rem', marginTop: '0.25rem' }}
+      />
+    </label>
   );
 }
